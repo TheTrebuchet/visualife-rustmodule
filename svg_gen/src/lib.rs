@@ -3,14 +3,14 @@ use std::sync::Mutex;
 use lazy_static::lazy_static;
 
 pub trait Shape: Send {
-    fn as_any(&self) -> &dyn std::any::Any;
+    //fn as_any(&self) -> &dyn std::any::Any;
     fn to_svg(&self) -> String;
 }
 
 impl Shape for Circle {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
+    //fn as_any(&self) -> &dyn std::any::Any {
+        //self
+    //}
 
     fn to_svg(&self) -> String {
         let mut svg_string = format!(
@@ -72,7 +72,7 @@ impl Canvas {
 }
 
 #[pymodule]
-fn svg_gen(py: Python, m: &PyModule) -> PyResult<()> {
+fn svg_gen(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<Circle>()?;
     m.add_class::<Canvas>()?;
     Ok(())
