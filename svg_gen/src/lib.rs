@@ -1,17 +1,21 @@
 use pyo3::prelude::*;
-use std::sync::Mutex;
-use lazy_static::lazy_static;
 
-pub trait Shape: Send {
+//this is the new strategy
+//each object can hold an infinite number of references to other objects, hence we have a tree
+//when creating an object we give it the "parent" as parameter, this parent then has a method executed 
+// (in init) called .add_child which gives that parent a reference of this newly created object
+// when we finally create the drawing we call the first "master" canvas,
+// this canvas will have a method for creating the so-called tree and this will be a problematic operation, 
+// hence here we will use the rust code completely
+
+
+pub trait ToSvg: Send {
     //fn as_any(&self) -> &dyn std::any::Any;
     fn to_svg(&self) -> String;
 }
 
-impl Shape for Circle {
-    //fn as_any(&self) -> &dyn std::any::Any {
-        //self
-    //}
 
+impl ToSvg for Circle {
     fn to_svg(&self) -> String {
         let mut svg_string = format!(
             r#"<circle cx="{}" cy="{}" r="{}""#,
@@ -23,35 +27,27 @@ impl Shape for Circle {
 }
 
 #[pyclass]
-#[derive(Clone)]
 struct Circle {
+    id: String,
     radius: f64,
     cx: f64,
     cy: f64,
+    children: Vec< ToSvg>
 }
 
 #[pymethods]
 impl Circle {
     #[new]
-    fn new(radius: f64, cx: f64, cy: f64) -> Self {
-        let circle = Circle { radius, cx, cy };
-        register_shape(Box::new(circle.clone()));
+    fn new(_py: Python, parent: &PyAny, id: String, radius: f64, cx: f64, cy: f64) -> Self {
+        let children = Vec::new();
+        let circle = Circle{id, radius, cx, cy, children};
+        parent.add_child(&circle);
         circle
     }
 
     fn __repr__(&self) -> PyResult<String> {
-        Ok(format!("Circle(radius: {}, cx: {}, cy: {})", self.radius, self.cx, self.cy))
+        Ok(format!("Circle{}", self.id))
     }
-}
-
-
-lazy_static! {
-    static ref SHAPES: Mutex<Vec<Box<dyn Shape>>> = Mutex::new(Vec::new());
-}
-
-fn register_shape(shape: Box<dyn Shape>) {
-    let mut shapes = SHAPES.lock().unwrap();
-    shapes.push(shape);
 }
 
 #[pyclass]
@@ -65,9 +61,8 @@ impl Canvas {
     }
 
     fn generate_string(&self) -> PyResult<String> {
-        let shapes = SHAPES.lock().unwrap();
-        let result = shapes.iter().map(|shape| shape.to_svg()).collect::<Vec<_>>().join("\n");
-        Ok(result)
+        let str = "svg".to_string();
+        Ok(str)
     }
 }
 
