@@ -1,15 +1,21 @@
 use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
 use std::sync::{Arc, Mutex};
 
-//this is the new strategy
-//each object can hold an infinite number of references to other objects, hence we have a tree
-//when creating an object we give it the "parent" as parameter, this parent then has a method executed 
+// here im trying to implement this idea, that in python
+// canvas = Canvas(...)
+// circle = Circle(canvas, ...)
+
+// this is the new strategy
+// each object can hold an infinite number of references to other objects, hence we have a tree
+// when creating an object we give it the "parent" as parameter, this parent then has a method executed 
 // (in init) called .add_child which gives that parent a reference of this newly created object
 // when we finally create the drawing we call the first "master" canvas,
 // this canvas will have a method for creating the so-called tree and this will be a problematic operation, 
 // hence here we will use the rust code completely
 
+// so far it looks like I can't properly call a method of the python object and pass the newly created (for ex.) circle object to it
+// intuitively I see that passing the circle to it as the circle is being created is not really possible
+// like, this struct hasn't been converted to python object yet
 
 pub trait ToSvg: Send{
     //fn as_any(&self) -> &dyn std::any::Any;
@@ -33,32 +39,61 @@ struct Circle {
     radius: f64,
     cx: f64,
     cy: f64,
-    children: Arc<Mutex<Vec<String>>>
+    children: Arc<Mutex<Vec<PyObject>>>
 }
 
 #[pymethods]
 impl Circle {
     #[new]
     fn new(_py: Python, parent: &PyAny, id: String, radius: f64, cx: f64, cy: f64) -> Self {
-        let children = ;
+        let children = Arc::new(Mutex::new(Vec::new()));
         let circle = Circle{id, radius, cx, cy, children};
-        parent.add_child(&circle);
+        let parent_ref: Py<PyAny> = parent.into();
+        //parent_ref.call_method1("add_child", (circle,)).unwrap(); ??????
+
         circle
     }
-
+    fn add_child(&self, py: Python, child: Py<PyAny>) {
+        let mut children = self.children.lock().unwrap();
+        children.push(child.clone_ref(py));
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("Circle{}", self.id))
     }
 }
 
+pub trait AddChild: {
+    //fn as_any(&self) -> &dyn std::any::Any;
+    fn add_child(&self, child: Py<PyAny>) -> &Self;
+}
+
+impl AddChild for Circle {
+    fn add_child(&self, child: Py<PyAny>) -> &Self {
+        let mut children = self.children.lock().unwrap();
+        children.push(child);
+        self
+    }
+}
+
+impl AddChild for Canvas {
+    fn add_child(&self, child: Py<PyAny>) -> &Self {
+        let mut children = self.children.lock().unwrap();
+        children.push(child);
+        self
+    }
+}
+
 #[pyclass]
-struct Canvas;
+struct Canvas {
+    children: Arc<Mutex<Vec<PyObject>>>
+}
 
 #[pymethods]
 impl Canvas {
     #[new]
     fn new() -> Self {
-        Canvas
+        let children = Arc::new(Mutex::new(Vec::new()));
+        Canvas { children }
     }
 
     fn generate_string(&self) -> PyResult<String> {
