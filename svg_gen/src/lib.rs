@@ -1,4 +1,6 @@
 use pyo3::prelude::*;
+use pyo3::wrap_pyfunction;
+use std::sync::{Arc, Mutex};
 
 //this is the new strategy
 //each object can hold an infinite number of references to other objects, hence we have a tree
@@ -9,11 +11,10 @@ use pyo3::prelude::*;
 // hence here we will use the rust code completely
 
 
-pub trait ToSvg: Send {
+pub trait ToSvg: Send{
     //fn as_any(&self) -> &dyn std::any::Any;
     fn to_svg(&self) -> String;
 }
-
 
 impl ToSvg for Circle {
     fn to_svg(&self) -> String {
@@ -32,14 +33,14 @@ struct Circle {
     radius: f64,
     cx: f64,
     cy: f64,
-    children: Vec< ToSvg>
+    children: Arc<Mutex<Vec<String>>>
 }
 
 #[pymethods]
 impl Circle {
     #[new]
     fn new(_py: Python, parent: &PyAny, id: String, radius: f64, cx: f64, cy: f64) -> Self {
-        let children = Vec::new();
+        let children = ;
         let circle = Circle{id, radius, cx, cy, children};
         parent.add_child(&circle);
         circle
