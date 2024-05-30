@@ -5,14 +5,6 @@ use std::sync::{Arc, Mutex};
 // canvas = Canvas(...)
 // circle = Circle(canvas, ...)
 
-// this is the new strategy
-// each object can hold an infinite number of references to other objects, hence we have a tree
-// when creating an object we give it the "parent" as parameter, this parent then has a method executed 
-// (in init) called .add_child which gives that parent a reference of this newly created object
-// when we finally create the drawing we call the first "master" canvas,
-// this canvas will have a method for creating the so-called tree and this will be a problematic operation, 
-// hence here we will use the rust code completely
-
 // so far it looks like I can't properly call a method of the python object and pass the newly created (for ex.) circle object to it
 // intuitively I see that passing the circle to it as the circle is being created is not really possible
 // like, this struct hasn't been converted to python object yet
