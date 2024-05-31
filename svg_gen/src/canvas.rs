@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use pyo3::types::PyDict;
 use std::sync::{Arc, Mutex};
 
 #[pyclass]
