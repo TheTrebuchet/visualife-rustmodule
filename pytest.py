@@ -1,7 +1,7 @@
 from svg_gen import Canvas, Circle
 import time
 
-canvas = Canvas()
+canvas = Canvas('test', 200, 200, 'canvas1')
 circles = []
 for i in range(10000):
     radius = 10.0 + i
@@ -12,8 +12,6 @@ for i in range(10000):
     canvas.add_child(circle)
 
 stoper = time.time()
-for c in circles: c.cx = 0
-result = canvas.generate_string()
-print(result)
+print(canvas.generate_string())
 print(time.time()-stoper)
 

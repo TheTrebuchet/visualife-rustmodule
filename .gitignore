@@ -12,3 +12,6 @@ svg_gen/Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+CanvasViewport.py
+SvgViewport.py
+pycrawl.py
