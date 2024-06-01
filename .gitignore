@@ -15,3 +15,5 @@ svg_gen/Cargo.lock
 CanvasViewport.py
 SvgViewport.py
 pycrawl.py
+random_painting.rs
+*.svg

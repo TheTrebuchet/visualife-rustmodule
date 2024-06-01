@@ -1,17 +1,28 @@
 from svg_gen import Canvas, Circle
 import time
-
-canvas = Canvas('test', 200, 200, 'canvas1')
-circles = []
-for i in range(10000):
-    radius = 10.0 + i
-    x = 5.0 * i
-    y = 5.0 * i
-    circle = Circle('circle'+str(i), radius, x, y)
-    circles.append(circle)
-    canvas.add_child(circle)
-
 stoper = time.time()
-print(canvas.generate_string())
+Width = 200
+Height = Width
+canvas = Canvas('test.svg', Width, Height, 'canvas1')
+
+numc = 100
+d = Width/numc
+x = 0
+y = 0
+circles = []
+radius = d/2
+while x<200 and y<200:
+    while x<200:
+        circle = Circle('circle', radius, x, y)    
+        circles.append(circle)
+        canvas.add_child(circle)
+        x+=d
+    y+=d
+    x=0
+
+
+canvas.complete_svg()
+canvas.save_svg()
 print(time.time()-stoper)
+print(len(circles))
 

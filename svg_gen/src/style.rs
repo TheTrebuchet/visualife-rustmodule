@@ -1,24 +1,28 @@
-// copied from github.com/dgront/rust-experiments/tree/master/vl_trial
+use pyo3::prelude::*;
+// partially copied from github.com/dgront/rust-experiments/tree/master/vl_trial
 
-use std::fmt;
-
-pub fn rgb_to_hex(r: u16, g: u16, b: u16) -> String {
-    format!("#{:02X}{:02X}{:02X}", r, g, b)
-}
-
-#[derive(Debug, Clone)]
+#[pyclass]
+#[derive(Clone)]
 pub struct Style {
+    #[pyo3(get, set)]
     pub fill: Option<String>,
+    #[pyo3(get, set)]
     pub stroke: Option<String>,
+    #[pyo3(get, set)]
     pub stroke_width: Option<f32>,
+    #[pyo3(get, set)]
     pub opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub fill_opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub stroke_opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub angle: f32,
 }
-
+#[pymethods]
 impl Style {
-    pub fn new() -> Self {
+    #[new]
+    pub fn new(_py: Python) -> Self {
         Style {
             fill: None,
             stroke: None,
@@ -28,34 +32,6 @@ impl Style {
             stroke_opacity: None,
             angle: 0.0,
         }
-    }
-
-    pub fn set_fill(&mut self, fill: &str) {
-        self.fill = Some(fill.to_string());
-    }
-
-    pub fn set_stroke(&mut self, stroke: &str) {
-        self.stroke = Some(stroke.to_string());
-    }
-
-    pub fn set_stroke_width(&mut self, stroke_width: f32) {
-        self.stroke_width = Some(stroke_width);
-    }
-
-    pub fn set_opacity(&mut self, opacity: f32) {
-        self.opacity = Some(opacity);
-    }
-
-    pub fn set_fill_opacity(&mut self, fill_opacity: f32) {
-        self.fill_opacity = Some(fill_opacity);
-    }
-
-    pub fn set_stroke_opacity(&mut self, stroke_opacity: f32) {
-        self.stroke_opacity = Some(stroke_opacity);
-    }
-
-    pub fn set_angle(&mut self, angle_deg: f32) {
-        self.angle = angle_deg;
     }
 
     pub fn to_string(&self) -> String {
@@ -87,4 +63,15 @@ impl Style {
 
         style_string
     }
+    // pub fn clone(&self) -> Style {
+    //     Style {
+    //         fill: self.fill,
+    //         stroke: self.stroke,
+    //         stroke_width: self.stroke_width,
+    //         opacity: self.opacity,
+    //         fill_opacity: self.fill_opacity,
+    //         stroke_opacity: self.stroke_opacity,
+    //         angle: self.angle,
+    //     }
+    //}
 }
