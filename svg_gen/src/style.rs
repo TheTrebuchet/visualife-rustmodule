@@ -63,15 +63,4 @@ impl Style {
 
         style_string
     }
-    // pub fn clone(&self) -> Style {
-    //     Style {
-    //         fill: self.fill,
-    //         stroke: self.stroke,
-    //         stroke_width: self.stroke_width,
-    //         opacity: self.opacity,
-    //         fill_opacity: self.fill_opacity,
-    //         stroke_opacity: self.stroke_opacity,
-    //         angle: self.angle,
-    //     }
-    //}
 }

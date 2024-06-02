@@ -20,7 +20,7 @@ pub struct Canvas {
 
     id: String,
     preambule: String,
-
+    #[pyo3(get, set)]
     style: Style,
 
     children: Arc<Mutex<Vec<PyObject>>>,
@@ -35,6 +35,11 @@ pub struct Canvas {
                           //parent_viewport = None
 }
 
+/// The main class for creating svg documents.
+///
+/// Use the `new` method to create a new instance of `Canvas`.
+/// Then use the `add_child` method to add your shapes to the canvas.
+/// Finally, call the `draw` method to output the svg document.
 #[pymethods]
 impl Canvas {
     #[new]
@@ -49,6 +54,7 @@ impl Canvas {
         let children = Arc::new(Mutex::new(Vec::new()));
         let combined_svg = String::new();
         let style = Style::new(_py);
+        let id = id.unwrap_or_else(|| "visualife_drawing".to_string());
         //still lacks kwargs
         Canvas {
             children,
@@ -61,14 +67,21 @@ impl Canvas {
             svg_y: 0,
             svg_width,
             svg_height,
-            id: id.unwrap_or_else(|| "visualife_drawing".to_string()),
+            id,
             preambule: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".to_string(),
             combined_svg,
             style
         }
     }
 
+           
     fn add_child(&self, py: Python, child: Py<PyAny>) {
+        let style = self.style.clone();
+        let result: Result<(), PyErr> = child.setattr(py, "style", style);
+        match result {
+            Ok(_svg) => eprintln!("set completed"),
+            Err(err) => eprintln!("Error setting style: {}", err),
+        }
         let mut children = self.children.lock().unwrap();
         children.push(child.clone_ref(py));
     }

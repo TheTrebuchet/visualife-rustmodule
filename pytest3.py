@@ -19,19 +19,17 @@ n_x, n_y = 100, 100
 box_width = 9.0
 max_noise = 0.5
 canvas = Canvas('drawing.svg', draw_width, draw_width, 'canvas')
+canvas.style.fill = rgb_to_hex(255, 100, 255)
 
 
 for i in range(n_x):
     max_drop = (i / 100.0 + 1.0) ** 3
     for j in range(n_y):
-        rng = random.Random()
-        style = Style()
-        
+        rng = random.Random()        
         fill = rgb_to_hex(255, i * 255 // n_x, j * 255 // n_y)
-        style.fill = fill
-        style.stroke = darker(fill, 0.3)
-        style.opacity = rng.uniform(0.6, 1.0)
-        style.stroke_width = rng.uniform(0.5, 2.0)
+        stroke = darker(fill, 0.3)
+        opacity = rng.uniform(0.6, 1.0)
+        stroke_width = rng.uniform(0.5, 2.0)
         
         noise_x = rng.uniform(-max_noise, max_noise)
         noise_y = rng.uniform(-max_noise, max_noise) + rng.uniform(max_drop / 2.0, max_drop)
@@ -43,12 +41,21 @@ for i in range(n_x):
         if rng.uniform(0.0, 1.0) < 0.1:
             circ = Circle(id, box_width, x, y)
             canvas.add_child(circ)
-            circ.style = style
+            circ.style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
+            circ.style.fill = fill
+            circ.style.stroke = stroke
+            circ.style.opacity = opacity
+            circ.style.stroke_width = stroke_width
+            
         else:
             rect = Rect(id, x, y, box_width, box_width)
-            style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
             canvas.add_child(rect)
-            rect.style = style
+            rect.style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
+            rect.style.fill = fill
+            rect.style.stroke = stroke
+            rect.style.opacity = opacity
+            rect.style.stroke_width = stroke_width
+            print(rect.style.stroke_width)
 print(time.time()-stopper)
 stopper = time.time()
 canvas.complete_svg()

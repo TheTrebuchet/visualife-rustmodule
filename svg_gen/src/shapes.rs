@@ -15,7 +15,6 @@ pub struct Circle {
     #[pyo3(get, set)]
     style: Style,
     children: Arc<Mutex<Vec<PyObject>>>,
-
 }
 
 #[pymethods]
@@ -30,7 +29,7 @@ impl Circle {
             cx,
             cy,
             children,
-            style
+            style,
         };
         circle
     }
@@ -87,18 +86,14 @@ impl Rect {
             rx: None,
             ry: None,
             children,
-            style
+            style,
         };
         rect
     }
-    
+
     fn add_child(&self, py: Python, child: Py<PyAny>) {
         let mut children = self.children.lock().unwrap();
         children.push(child.clone_ref(py));
-    }
-
-    fn transform(&self, py: Python, transformation: String) {
-
     }
 
     fn to_svg(&self) -> String {
@@ -123,7 +118,9 @@ impl Rect {
         if self.style.angle != 0.0 {
             svg_string.push_str(&format!(
                 r#" transform="rotate({} {} {})""#,
-                self.style.angle, self.x + self.width / 2.0, self.y + self.height / 2.0
+                self.style.angle,
+                self.x + self.width / 2.0,
+                self.y + self.height / 2.0
             ));
         }
         svg_string.push_str(r#" />"#);
