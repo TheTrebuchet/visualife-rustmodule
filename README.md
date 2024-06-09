@@ -3,14 +3,54 @@ a python module that could be later integrated into visualife, that would would 
 
 
 ## the main strategy I can see is:
-Each object can hold an infinite number of references to other objects, hence we have a tree
-After or during creation of the new object, we give the parent its reference.
-When we finally create the drawing we call only the master canvas.
-Each (and only) canvas will have a method for creating the so-called tree and this will be a problematic operation, this will nicely utilize the rust performance.
-Any kind of style can be easly cloned from the parent.
-This solves most of the objectives we have.
+The strategy will be different from now on
 
-currently this strategy seems to be working
+we want a working rust module just for use in rust and we want python classes that can be like a bridge between that rust module and python
+
+that way in the future we could have a separate working rust and python modules
+
+currently I can see the python module being also written in rust, pyo3 will be used solely for managing python objects, rust structs and converting the inputs to rust types
+
+precisesly:
+there must be a crate that only works in rust (visualirs)
+for this there must be a separate crate that communicates python with rust (visualipy)
+
+so the rust parent holds references to rust structs
+and it all works beautifully in rust
+it could be that one mutable reference of an object exists
+but...
+
+but in python... we create a python object
+and when we add a child, the Python object must receive references of this struct
+then changes to the python object change the struct with appropriate methods
+a struct is already used by the rust API
+
+so looking from the user's side
+user calls:
+  canvas = Canvas()
+this creates a visualipy module object
+and at the same time struct visualirs, held by this Python object
+
+when the user calls:
+  circle = Circle()
+the same thing happens
+
+when adding a circle to canvas
+  canvas.add(circle)
+then the circle reference goes first to canvas python object
+and then to the canvas struct from visualirs
+
+when we call build svg
+  canvas.generate()
+we call struct canvas, which holds references to only rust structs, so everything works fast in rust
+it returns a rust string to visualip, which converts it very quickly into a python string and returns it to python
+
+modifying objects also works via visualipy
+it must have defined methods for changing variables of rust structs
+each method changes a variable in the python object and in the assigned struct
+
+from rust's perspective, each struct has to be in an arc mutex
+because it will have two mutable references, one in parent python object and one in parent rust struct
 
 ## Objectives to acomplish
 
