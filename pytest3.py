@@ -41,21 +41,24 @@ for i in range(n_x):
         if rng.uniform(0.0, 1.0) < 0.1:
             circ = Circle(id, box_width, x, y)
             canvas.add_child(circ)
-            circ.style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
-            circ.style.fill = fill
-            circ.style.stroke = stroke
-            circ.style.opacity = opacity
-            circ.style.stroke_width = stroke_width
+            t_style = circ.style
+            t_style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
+            t_style.fill = fill
+            t_style.stroke = stroke
+            t_style.opacity = opacity
+            t_style.stroke_width = stroke_width
+            circ.style = t_style
             
         else:
             rect = Rect(id, x, y, box_width, box_width)
             canvas.add_child(rect)
-            rect.style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
-            rect.style.fill = fill
-            rect.style.stroke = stroke
-            rect.style.opacity = opacity
-            rect.style.stroke_width = stroke_width
-            print(rect.style.stroke_width)
+            t_style = rect.style
+            t_style.angle = rng.uniform(0.0, i * j * 60.0 / (n_x * n_y))
+            t_style.fill = fill
+            t_style.stroke = stroke
+            t_style.opacity = opacity
+            t_style.stroke_width = stroke_width
+            rect.style = t_style
 print(time.time()-stopper)
 stopper = time.time()
 canvas.complete_svg()

@@ -76,13 +76,15 @@ impl Canvas {
 
            
     fn add_child(&self, py: Python, child: Py<PyAny>) {
+        
         let style = self.style.clone();
         let result: Result<(), PyErr> = child.setattr(py, "style", style);
         match result {
             Ok(_svg) => eprintln!("set completed"),
             Err(err) => eprintln!("Error setting style: {}", err),
         }
-        let mut children = self.children.lock().unwrap();
+        
+        let mut children: std::sync::MutexGuard<Vec<Py<PyAny>>> = self.children.lock().unwrap();
         children.push(child.clone_ref(py));
     }
 
@@ -117,17 +119,6 @@ impl Canvas {
             bgcolor = bgcolor,
         );
         combined_svg.push_str(&header2);
-
-        //if !self.file_name.is_empty() {
-        // Append style element string
-        //            combined_svg.push_str(&format!(
-        //              r#"<style>
-        //            .default_text_style {{{}}}
-        //          .default_drawing_style {{{}}}
-        //        </style>"#,
-        //      self.text_style, self.style
-        //));
-        //}
 
         //the svgs of children
         let locked_children = self.children.lock().unwrap();

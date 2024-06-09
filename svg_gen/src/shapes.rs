@@ -42,8 +42,8 @@ impl Circle {
     }
     fn to_svg(&self) -> String {
         let mut svg_string = format!(
-            r#"<circle cx="{}" cy="{}" r="{}""#,
-            self.cx, self.cy, self.radius
+            r#"<circle id="{}" cx="{}" cy="{}" r="{}""#,
+            self.id, self.cx, self.cy, self.radius
         );
         let style_string = self.style.to_string();
         if !style_string.is_empty() {
