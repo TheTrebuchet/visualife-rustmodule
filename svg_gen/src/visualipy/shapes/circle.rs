@@ -17,7 +17,7 @@ pub struct Circle {
 impl Circle {
     #[new]
     fn new(_py: Python, id: String, radius: f32, cx: f32, cy: f32) -> Self {
-        let child = CircleRs::new(id, radius, cx, cy);
+        let child = CircleRs::new(id.clone(), radius, cx, cy);
         let style = Style::new(_py);
         let circle = Circle {
             id,

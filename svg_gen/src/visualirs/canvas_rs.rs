@@ -54,7 +54,7 @@ impl CanvasRs {
     }
 
            
-    pub fn add_child<T: ToSvg>(&self, child: T) {
+    pub fn add_child<T: ToSvg + 'static>(&self, child: T) {
         let mut children = self.children.lock().unwrap();
         children.push(Box::new(child));
     }

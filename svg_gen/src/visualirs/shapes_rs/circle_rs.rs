@@ -25,10 +25,9 @@ impl CircleRs {
             r#"<circle cx="{}" cy="{}" r="{}"#,
             self.cx, self.cy, self.radius
         );
-        let style_string = self.style.expect("REASON").lock().unwrap().to_string();
-        if !style_string.is_empty() {
+        if !self.style.is_none() {
+            let style_string = self.style.as_ref().expect("REASON").lock().unwrap().to_string();
             svg_string.push_str(&format!(r#" style="{}""#, style_string));
-
         }
         
         svg_string.push_str(r#" />"#);
