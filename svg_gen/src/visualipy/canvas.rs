@@ -17,11 +17,6 @@ pub struct Canvas {
     rs_struct: Arc<Mutex<CanvasRs>>,
 }
 
-/// The main class for creating svg documents.
-///
-/// Use the `new` method to create a new instance of `Canvas`.
-/// Then use the `add_child` method to add your shapes to the canvas.
-/// Finally, call the `draw` method to output the svg document.
 #[pymethods]
 impl Canvas {
     #[new]

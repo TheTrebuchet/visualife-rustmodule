@@ -13,8 +13,6 @@ pub use crate::visualipy::shapes::{Rect, Circle};
 // circle = Circle(...)
 // canvas.add_child(circle)
 
-// we should totally call them students and researchgroups or something
-
 #[pymodule]
 fn svg_gen(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<Canvas>()?;
