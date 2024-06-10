@@ -1,12 +1,11 @@
 use pyo3::prelude::*;
-mod canvas;
-mod shapes;
-mod style;
+mod visualipy;
+mod visualirs;
 
-pub use crate::canvas::Canvas;
-pub use crate::shapes::Circle;
-pub use crate::shapes::Rect;
-pub use crate::style::Style;
+
+pub use crate::visualirs::*;
+pub use crate::visualipy::{Canvas, Style};
+pub use crate::visualipy::shapes::{Rect, Circle};
 
 
 // here im trying to implement this idea, that in python
@@ -14,7 +13,7 @@ pub use crate::style::Style;
 // circle = Circle(...)
 // canvas.add_child(circle)
 
-// we should totally call them students and scientists or something
+// we should totally call them students and researchgroups or something
 
 #[pymodule]
 fn svg_gen(_py: Python, m: &PyModule) -> PyResult<()> {
