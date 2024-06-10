@@ -1,11 +1,12 @@
 use pyo3::prelude::*;
-mod visualipy;
-mod visualirs;
+mod canvas;
+mod shapes;
+mod style;
 
-
-pub use crate::visualirs::*;
-pub use crate::visualipy::{Canvas, Style};
-pub use crate::visualipy::shapes::{Rect, Circle};
+pub use crate::canvas::Canvas;
+pub use crate::shapes::Circle;
+pub use crate::shapes::Rect;
+pub use crate::style::Style;
 
 
 // here im trying to implement this idea, that in python

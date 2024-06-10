@@ -1,18 +1,29 @@
+use pyo3::prelude::*;
 // partially copied from github.com/dgront/rust-experiments/tree/master/vl_trial
+
+#[pyclass]
 #[derive(Clone)]
-pub struct StyleRs {
+pub struct Style {
+    #[pyo3(get, set)]
     pub fill: Option<String>,
+    #[pyo3(get, set)]
     pub stroke: Option<String>,
+    #[pyo3(get, set)]
     pub stroke_width: Option<f32>,
+    #[pyo3(get, set)]
     pub opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub fill_opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub stroke_opacity: Option<f32>,
+    #[pyo3(get, set)]
     pub angle: f32,
 }
-
-impl StyleRs {
-    pub fn new() -> Self {
-        StyleRs {
+#[pymethods]
+impl Style {
+    #[new]
+    pub fn new(_py: Python) -> Self {
+        Style {
             fill: None,
             stroke: None,
             stroke_width: None,

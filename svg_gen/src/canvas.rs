@@ -1,11 +1,13 @@
+use pyo3::prelude::*;
+use pyo3::types::PyAny;
 use std::fs::File;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
-use crate::visualirs::shapes_rs::ToSvg;
 
 use crate::Style;
 
-pub struct CanvasRs {
+#[pyclass]
+pub struct Canvas {
     file_name: String,
     x_0: i32,
     y_0: i32,
@@ -18,25 +20,30 @@ pub struct CanvasRs {
 
     id: String,
     preambule: String,
-    style: Option<Style>,
+    #[pyo3(get, set)]
+    style: Style,
 
-    children: Arc<Mutex<Vec<Box<dyn ToSvg>>>>,
+    children: Arc<Mutex<Vec<PyObject>>>,
     combined_svg: String,
 }
-
-impl CanvasRs {
-    pub fn new(
+#[pymethods]
+impl Canvas {
+    #[new]
+    fn new(
+        _py: Python,
         file_name: String,
         svg_width: i32,
         svg_height: i32,
         id: Option<String>,
     ) -> Self {
         let (x_min, y_min, x_max, y_max) = (0, 0, svg_width, svg_height);
+        let children = Arc::new(Mutex::new(Vec::new()));
         let combined_svg = String::new();
+        let style = Style::new(_py);
         let id = id.unwrap_or_else(|| "visualife_drawing".to_string());
         //still lacks kwargs
-        CanvasRs {
-            children: Arc::new( Mutex::new(Vec::new())),
+        Canvas {
+            children,
             file_name,
             x_0: x_min,
             y_0: y_min,
@@ -47,19 +54,27 @@ impl CanvasRs {
             svg_width,
             svg_height,
             id,
-            preambule: r#"<?xml version="1.0" encoding="utf-8"?>"#.to_string(),
+            preambule: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".to_string(),
             combined_svg,
-            style: None
+            style
         }
     }
 
            
-    pub fn add_child<T: ToSvg>(&self, child: T) {
-        let mut children = self.children.lock().unwrap();
-        children.push(Box::new(child));
+    fn add_child(&self, py: Python, child: Py<PyAny>) {
+        
+        let style = self.style.clone();
+        let result: Result<(), PyErr> = child.setattr(py, "style", style);
+        match result {
+            Ok(_svg) => eprintln!("set completed"),
+            Err(err) => eprintln!("Error setting style: {}", err),
+        }
+        
+        let mut children: std::sync::MutexGuard<Vec<Py<PyAny>>> = self.children.lock().unwrap();
+        children.push(child.clone_ref(py));
     }
 
-    pub fn complete_svg(&mut self) -> String {
+    fn complete_svg(&mut self, py: Python) -> PyResult<String> {
         let mut combined_svg = String::new();
         combined_svg.push_str(&self.preambule);
 
@@ -94,12 +109,21 @@ impl CanvasRs {
         //the svgs of children
         let locked_children = self.children.lock().unwrap();
         for obj in locked_children.iter() {
-            combined_svg.push_str(&obj.to_svg());
+            let py_any: &PyAny = obj.as_ref(py);
+            let result: Result<String, PyErr> = py_any.call_method0("to_svg").unwrap().extract();
+            let svg_string = match result {
+                Ok(svg) => svg,
+                Err(err) => {
+                    eprintln!("Error extracting SVG string: {}", err);
+                    continue;
+                }
+            };
+            combined_svg.push_str(&svg_string);
         }
 
         combined_svg.push_str("</svg>");
         self.combined_svg = combined_svg.clone();
-        combined_svg
+        Ok(combined_svg)
     }
 
     fn save_svg(&self) {

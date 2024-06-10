@@ -37,7 +37,7 @@ the same thing happens
 
 when adding a circle to canvas
   canvas.add(circle)
-the circle's reference goes first to canvas python object
+then the circle reference goes first to canvas python object
 and then to the canvas struct from visualirs
 
 when we call build svg
