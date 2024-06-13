@@ -28,7 +28,7 @@ impl Canvas {
         id: Option<String>,
     ) -> Self {
         let rs_struct = Arc::new(Mutex::new(CanvasRs::new(
-            file_name, svg_width, svg_height, id,
+            file_name.clone(), svg_width, svg_height, id.clone(),
         )));
         Canvas {
             id,
@@ -53,7 +53,7 @@ impl Canvas {
         };
     }
 
-    fn complete_svg(&mut self, py: Python) -> PyResult<String> {
+    fn complete_svg(&mut self) -> PyResult<String> {
         Ok(self.rs_struct.lock().unwrap().complete_svg())
     }
 
