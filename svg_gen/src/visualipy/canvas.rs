@@ -43,7 +43,11 @@ impl Canvas {
     fn add_child(&self, py: Python, child: Py<PyAny>) {
         match child.getattr(py, "rs_struct") {
             Ok(rs_struct) => {
-                let arc_mutex = rs_struct.lock().unwrap();
+                // I need to add at least the clone of rs_struct to the chidren attribute in the CanvasRs struct
+                // for that I need to check if the rs_struct is an Arc<Mutex<...>>
+                // ideally I wouldn't have to clone it, but I couldn't find a way to do that
+                // I would probably have to check every type of object the module introduces (Rect, Cricle, etc.)
+                let arc_mutex: Arc<Mutex<RectRs>> = rs_struct.extract(py)?; 
                 }
             Err(_) => {}
         };
